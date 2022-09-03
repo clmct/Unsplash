@@ -1,0 +1,67 @@
+excluded:
+  - Pods
+  - .git
+
+opt_in_rules:
+  - force_unwrapping
+  - private_action
+  - private_outlet
+  - array_init
+  - closure_body_length
+  - contains_over_first_not_nil
+  - empty_count
+  - empty_string
+  - explicit_init
+  - fallthrough
+  - first_where
+  - implicitly_unwrapped_optional
+  - operator_usage_whitespace
+  - sorted_first_last
+  - switch_case_on_newline
+  - trailing_closure
+  - unneeded_parentheses_in_closure_argument
+  - unused_import
+  - vertical_parameter_alignment_on_call
+
+disabled_rules:
+  - trailing_whitespace
+
+custom_rules:
+  empty_first_line:
+    name: 'Empty First Line'
+    regex: '(^[ a-zA-Z ]*(?:protocol|extension|class|struct|func) [ a-zA-Z0-9:,<>\.\(\)\"-=`]*\{\n( *)?\n)'
+    message: 'There should not be an empty line after a declaration'
+    severity: warning
+
+  comments_space:
+    name: 'Space After Comment'
+    regex: '(^ *//\w+)'
+    message: 'There should be a space after //'
+    severity: warning
+
+  type_annotation_empty_arrays_dictionaries:
+    name: 'Type Annotation for Empty Arrays and Dictionaries'
+    regex: '= (?!\[:\])\[[a-zA-Z(), :]+\]\(\)'
+    message: 'For empty arrays and dictionaries, use type annotation'
+    severity: warning
+
+empty_count: warning
+
+function_parameter_count:
+  warning: 10
+  error: 10
+
+type_name:
+  excluded:
+    - T
+
+line_length: 120
+
+identifier_name:
+  excluded:
+    - x
+    - y
+    
+file_length:
+  warning: 500
+  error: 800
