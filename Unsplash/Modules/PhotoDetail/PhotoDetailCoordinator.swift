@@ -1,7 +1,11 @@
 import UIKit
 
-final class FavoritePhotosCoordinator: CoordinatorProtocol {
+protocol PhotoDetailCoordinatorDelegate: AnyObject {
+}
+
+final class PhotoDetailCoordinator: CoordinatorProtocol {
   // MARK: - Properties
+  weak var delegate: PhotoDetailCoordinatorDelegate?
   var navigationController: UINavigationController
   private var childCoordinators: [CoordinatorProtocol] = []
   private let appDependency: AppDependency
@@ -15,9 +19,6 @@ final class FavoritePhotosCoordinator: CoordinatorProtocol {
   
   // MARK: - Public Methods
   func start() {
-    let viewModel = FavoritePhotosViewModel(dependencies: appDependency)
-    let viewController = FavoritePhotosViewController(viewModel: viewModel)
-    navigationController.pushViewController(viewController, animated: true)
   }
   
   // MARK: - Private Methods

@@ -2,16 +2,9 @@ import UIKit
 
 final class MainCoordinator: CoordinatorProtocol {
   // MARK: - Properties
-  var navigationController: UINavigationController
+  var navigationController = UINavigationController()
   private var childCoordinators: [CoordinatorProtocol] = []
-  private let appDependency: AppDependency
-  
-  // MARK: - Init
-  init(appDependency: AppDependency,
-       navigationController: UINavigationController) {
-    self.appDependency = appDependency
-    self.navigationController = navigationController
-  }
+  private let appDependency = AppDependency()
   
   // MARK: - Public Methods
   func start() {
@@ -19,11 +12,13 @@ final class MainCoordinator: CoordinatorProtocol {
 
     let photoCollectionNC = UINavigationController()
     photoCollectionNC.tabBarItem.title = "Photos"
+    photoCollectionNC.tabBarItem.image = UIImage(systemName: "photo")
     let photoCollectionCoordinator = PhotoCollectionCoordinator(appDependency: appDependency,
                                                                 navigationController: photoCollectionNC)
 
     let favoritePhotosNC = UINavigationController()
     favoritePhotosNC.tabBarItem.title = "Favorite photos"
+    favoritePhotosNC.tabBarItem.image = UIImage(systemName: "star")
     let favoritePhotosCoordinator = FavoritePhotosCoordinator(appDependency: appDependency,
                                                               navigationController: favoritePhotosNC)
 
@@ -32,10 +27,7 @@ final class MainCoordinator: CoordinatorProtocol {
     childCoordinators.append(favoritePhotosCoordinator)
     photoCollectionCoordinator.start()
     favoritePhotosCoordinator.start()
-
     tabBarController.modalPresentationStyle = .fullScreen
     navigationController.present(tabBarController, animated: false, completion: nil)
   }
-  
-  // MARK: - Private Methods
 }

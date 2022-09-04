@@ -1,7 +1,9 @@
 import UIKit
+import Combine
 
 final class PhotoCollectionViewController: UIViewController {
   // MARK: - Properties
+  private var subscriptions = Set<AnyCancellable>()
   private let viewModel: PhotoCollectionViewModelProtocol
   private let collectionViewLayout = CustomCollectionViewLayout()
   private lazy var collectionView = UICollectionView(frame: .zero,
@@ -22,8 +24,8 @@ final class PhotoCollectionViewController: UIViewController {
   override func viewDidLoad() {
     super.viewDidLoad()
     bindToViewModel()
-    view.backgroundColor = .red
     setup()
+    viewModel.loadPhotos()
   }
   
   // MARK: - Public Methods
@@ -32,6 +34,12 @@ final class PhotoCollectionViewController: UIViewController {
   
   // MARK: - Private Methods
   private func bindToViewModel() {
+    viewModel.tableViewPublisher
+      .receive(on: DispatchQueue.main)
+      .sink { [weak self] _ in
+        self?.collectionView.reloadData()
+      }
+      .store(in: &subscriptions)
   }
 
   private func setup() {
@@ -42,7 +50,6 @@ final class PhotoCollectionViewController: UIViewController {
   private func setupCollectionView() {
     collectionView.delegate = self
     collectionView.dataSource = self
-//    collectionViewLayout.delegate = self
     collectionView.register(PhotoCollectionViewCell.self,
                             forCellWithReuseIdentifier: PhotoCollectionViewCell.identifier)
     view.addSubview(collectionView)
@@ -65,41 +72,22 @@ final class PhotoCollectionViewController: UIViewController {
 
 extension PhotoCollectionViewController: UICollectionViewDataSource {
   func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-    100
+    return viewModel.numberOfItemsInSection
   }
 
   func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-    guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PhotoCollectionViewCell.identifier,
+    guard let viewModel = viewModel.cellViewModel(at: indexPath),
+          let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PhotoCollectionViewCell.identifier,
                                                         for: indexPath) as? PhotoCollectionViewCell else {
       return UICollectionViewCell()
     }
-    cell.backgroundColor = .gray
-//    cell.configure(image: images[indexPath.row] ?? UIImage())
+    cell.configure(with: viewModel)
     return cell
   }
-
 }
 
 extension PhotoCollectionViewController: UICollectionViewDelegate {
-}
-
-extension PhotoCollectionViewController: PinterestLayoutDelegate {
-  func collectionView( _ collectionView: UICollectionView,
-                       heightForCellAtIndexPath indexPath: IndexPath) -> CGFloat {
-    let height: CGFloat
-    switch indexPath.item {
-    case 0, 4, 8:
-      height = 210
-    case 1, 5, 9:
-      height = 170
-    case 2, 6, 10:
-      height = 170
-    case 3, 7, 11:
-      height = 210
-    default:
-      height = 170
-    }
-    return height
+  func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
   }
 }
 
@@ -107,7 +95,6 @@ extension PhotoCollectionViewController: PinterestLayoutDelegate {
 extension PhotoCollectionViewController: UISearchResultsUpdating {
   func updateSearchResults(for searchController: UISearchController) {
     guard let text = searchController.searchBar.text else { return }
-    let index = searchController.searchBar.selectedScopeButtonIndex
-//    viewModel?.updateSearchResults(text: text, index: index)
+    viewModel.updateSearchResults(with: text)
   }
 }

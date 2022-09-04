@@ -21,6 +21,7 @@ final class PhotoCollectionCoordinator: CoordinatorProtocol {
   func start() {
     let viewModel = PhotoCollectionViewModel(dependencies: appDependency)
     let viewController = PhotoCollectionViewController(viewModel: viewModel)
+    viewController.navigationItem.title = "Photos"
     navigationController.pushViewController(viewController, animated: true)
   }
   

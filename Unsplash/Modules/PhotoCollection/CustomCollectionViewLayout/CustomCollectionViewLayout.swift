@@ -1,18 +1,9 @@
 import UIKit
 
-protocol PinterestLayoutDelegate: AnyObject {
-  func collectionView(_ collectionView: UICollectionView, heightForCellAtIndexPath indexPath: IndexPath) -> CGFloat
-}
-
 class CustomCollectionViewLayout: UICollectionViewLayout {
-  weak var delegate: PinterestLayoutDelegate?
-
-  private let numberOfColumns = 4
-  private let cellPadding: CGFloat = 10
-
-  private var cache: [UICollectionViewLayoutAttributes] = []
-
-  private var contentHeight: CGFloat = 0
+  override var collectionViewContentSize: CGSize {
+    return CGSize(width: contentWidth, height: contentHeight)
+  }
 
   private var contentWidth: CGFloat {
     guard let collectionView = collectionView else {
@@ -22,9 +13,10 @@ class CustomCollectionViewLayout: UICollectionViewLayout {
     return collectionView.bounds.width - (insets.left + insets.right)
   }
 
-  override var collectionViewContentSize: CGSize {
-    return CGSize(width: contentWidth, height: contentHeight)
-  }
+  private var cache: [UICollectionViewLayoutAttributes] = []
+  private var contentHeight: CGFloat = 0
+  private let numberOfColumns = 2
+  private let cellPadding: CGFloat = 4
 
   override func prepare() {
     guard cache.isEmpty == true, let collectionView = collectionView else { return }
@@ -39,8 +31,7 @@ class CustomCollectionViewLayout: UICollectionViewLayout {
 
     for item in 0..<collectionView.numberOfItems(inSection: 0) {
       let indexPath = IndexPath(item: item, section: 0)
-      let cellHeight = delegate?.collectionView(collectionView,
-                                                heightForCellAtIndexPath: indexPath) ?? columnWidth
+      let cellHeight = getCellHeight(for: item)
       let height = cellPadding * 2 + cellHeight
       let frame = CGRect(x: xOffset[column],
                          y: yOffset[column],
@@ -68,5 +59,19 @@ class CustomCollectionViewLayout: UICollectionViewLayout {
 
   override func layoutAttributesForItem(at indexPath: IndexPath) -> UICollectionViewLayoutAttributes? {
     return cache[indexPath.item]
+  }
+
+  private func getCellHeight(for index: Int) -> CGFloat {
+    let localIndex = index % 4
+    var height = 170
+    switch localIndex {
+    case 0, 3:
+      height = 220
+    case 1, 2:
+      height = 160
+    default:
+      height = 160
+    }
+    return CGFloat(height)
   }
 }

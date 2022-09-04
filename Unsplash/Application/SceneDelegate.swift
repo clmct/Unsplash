@@ -2,7 +2,7 @@ import UIKit
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
   var window: UIWindow?
-  let appCoordinator = AppCoordinator()
+  let appCoordinator = MainCoordinator()
 
   func scene(_ scene: UIScene,
              willConnectTo session: UISceneSession,
@@ -12,7 +12,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     window.rootViewController = appCoordinator.navigationController
     window.makeKeyAndVisible()
     self.window = window
-    self.window?.backgroundColor = .orange
     appCoordinator.start()
   }
 }

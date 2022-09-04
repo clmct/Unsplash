@@ -1,13 +1,9 @@
 import Foundation
 import Alamofire
 
-public enum HTTPError: Equatable {
-    case statusCode(Int)
-    case invalidResponse
-}
-
 protocol NetworkServiceProtocol {
   func getPhotos() async throws -> [Photo]
+  func searchPhotos(with query: String) async throws -> [Photo]
 }
 
 protocol APIRouteable: URLRequestConvertible {
@@ -20,7 +16,6 @@ protocol APIRouteable: URLRequestConvertible {
 
 extension APIRouteable {
   var baseURL: String { return "https://api.unsplash.com/" }
-  // MARK: - URLRequestConvertible
   func asURLRequest() throws -> URLRequest {
     let url = try baseURL.asURL().appendingPathComponent(path)
     var urlRequest = URLRequest(url: url)
@@ -37,18 +32,27 @@ struct GetBooks: APIRouteable {
   var encoding: ParameterEncoding
 }
 
-class NetworkService: NetworkServiceProtocol {
-  func performRequest<T: Codable>(urlRequestConvertible: URLRequestConvertible) async throws -> T {
+final  class NetworkService: NetworkServiceProtocol {
+  private func performRequest<T: Codable>(urlRequestConvertible: URLRequestConvertible) async throws -> T {
     let dataTask = AF.request(urlRequestConvertible).serializingDecodable(T.self)
-    await print(dump(dataTask.response))
-    let value = try await dataTask.value // Returns the TestResponse or throws the AFError as an Error
-
+    let value = try await dataTask.value
+    dump(value)
     return value
   }
 
   func getPhotos() async throws -> [Photo] {
-    let request = GetBooks(path: "photos", method: .get, parameters: ["page": 1], encoding: URLEncoding.queryString)
-    return try await AF.request(request).serializingDecodable([Photo].self).value
-//    return try await performRequest(urlRequestConvertible: request)
+    let request = GetBooks(path: "photos",
+                           method: .get,
+                           parameters: ["page": 1, "per_page": 100],
+                           encoding: URLEncoding.queryString)
+    return try await performRequest(urlRequestConvertible: request)
+  }
+
+  func searchPhotos(with query: String) async throws -> [Photo] {
+    let request = GetBooks(path: "/search/photos",
+                           method: .get,
+                           parameters: ["page": 1, "per_page": 100, "query": query],
+                           encoding: URLEncoding.queryString)
+    return try await performRequest(urlRequestConvertible: request)
   }
 }
