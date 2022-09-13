@@ -2,5 +2,4 @@
 
 iOS 13+
 
-swift
-iOS
+swift iOS app
