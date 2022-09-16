@@ -1,4 +1,4 @@
-# Unsplash
+# Unsplash app
 
 iOS 13+
 
